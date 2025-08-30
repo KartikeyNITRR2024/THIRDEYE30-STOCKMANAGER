@@ -1,11 +1,13 @@
 # Stage 1: Build the application
 FROM maven:3.8.5-openjdk-17 AS build
 
-# Copy project files into container
-COPY . /app
+# Set working directory
 WORKDIR /app
 
-# Build the application JAR (skip tests for speed)
+# Copy project files into the container
+COPY . .
+
+# Build the application JAR (skip tests for faster builds)
 RUN mvn clean package -DskipTests
 
 # Stage 2: Create a lightweight runtime image
@@ -14,7 +16,7 @@ FROM openjdk:17-slim
 # Copy the correct JAR file from the build stage
 COPY --from=build /app/target/THIRDEYE3.0_STOCKMANAGER-0.0.1-SNAPSHOT.jar app.jar
 
-# Expose the port for this service
+# Expose the application's port
 EXPOSE 8080
 
 # Start the Spring Boot application

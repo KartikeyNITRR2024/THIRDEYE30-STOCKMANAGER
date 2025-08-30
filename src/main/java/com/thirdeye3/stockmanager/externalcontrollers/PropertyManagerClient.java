@@ -9,6 +9,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @FeignClient(name = "THIRDEYE30-PROPERTYMANAGER")
+
 public interface PropertyManagerClient {
 
     @GetMapping("/api/machines/webscrapper")
