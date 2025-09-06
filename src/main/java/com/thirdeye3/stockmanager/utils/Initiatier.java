@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.thirdeye3.stockmanager.services.MachineService;
 import com.thirdeye3.stockmanager.services.PropertyService;
+import com.thirdeye3.stockmanager.services.StockService;
 
 import jakarta.annotation.PostConstruct;
 
@@ -20,6 +21,9 @@ public class Initiatier {
 	
 	@Autowired
 	PropertyService propertyService;
+	
+	@Autowired
+	StockService stockService;
     
     
 	@PostConstruct
@@ -27,6 +31,7 @@ public class Initiatier {
         logger.info("Initializing Initiatier...");
         machineService.fetchMachines();
         propertyService.fetchProperties();
+        stockService.updateStocks();
         logger.info("Initiatier initialized.");
     }
 
