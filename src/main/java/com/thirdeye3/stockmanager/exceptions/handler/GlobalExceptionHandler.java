@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import com.thirdeye3.stockmanager.dtos.Response;
+import com.thirdeye3.stockmanager.exceptions.CSVException;
 import com.thirdeye3.stockmanager.exceptions.InvalidMachineException;
 import com.thirdeye3.stockmanager.exceptions.PropertyFetchException;
 import com.thirdeye3.stockmanager.exceptions.ResourceNotFoundException;
@@ -44,6 +45,19 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(response, HttpStatus.SERVICE_UNAVAILABLE);
     }
+    
+    @ExceptionHandler(CSVException.class)
+    public ResponseEntity<Response<Void>> handleCSVException(CSVException ex) {
+        Response<Void> response = new Response<>(
+                false,
+                HttpStatus.EXPECTATION_FAILED.value(),
+                ex.getMessage(),
+                null
+        );
+        return new ResponseEntity<>(response, HttpStatus.SERVICE_UNAVAILABLE);
+    }
+    
+    
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Response<Void>> handleGeneric(Exception ex) {

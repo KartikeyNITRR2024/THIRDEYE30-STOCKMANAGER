@@ -1,5 +1,8 @@
 package com.thirdeye3.stockmanager.services.impl;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,8 +15,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.thirdeye3.stockmanager.dtos.StockDto;
 import com.thirdeye3.stockmanager.entities.Stock;
+import com.thirdeye3.stockmanager.exceptions.CSVException;
 import com.thirdeye3.stockmanager.exceptions.ResourceNotFoundException;
 import com.thirdeye3.stockmanager.repositories.StockRepo;
 import com.thirdeye3.stockmanager.services.MachineService;
@@ -185,5 +191,46 @@ public class StockServiceImpl implements StockService {
             updateStocks();
         }
         return (long) stocks.size();
+	}
+
+	@Override
+	public void addStocksUsingCsv(MultipartFile file) {
+		List<StockDto> stockList = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+
+            String line;
+            boolean firstLine = true;
+            long idCounter = 1L;
+
+            while ((line = br.readLine()) != null) {
+                if (firstLine) {
+                    firstLine = false;
+                    continue;
+                }
+
+                String[] values = line.split(",");
+                if (values.length == 2) {
+                    String uniqueCode = values[1].trim();
+                    String marketCode = values[2].trim();
+
+                    StockDto stock = new StockDto(
+                            null,
+                            uniqueCode,
+                            marketCode,
+                            null,                
+                            null,            
+                            null
+                    );
+
+                    stockList.add(stock);
+                }
+            }
+
+        } catch (Exception e) {
+            throw new CSVException("Failed to parse CSV file: " + e.getMessage());
+        }
+        addStocks(stockList);
 	}
 }

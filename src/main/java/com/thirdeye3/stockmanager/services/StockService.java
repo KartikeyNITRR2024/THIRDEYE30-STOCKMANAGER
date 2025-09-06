@@ -2,8 +2,9 @@ package com.thirdeye3.stockmanager.services;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.thirdeye3.stockmanager.dtos.StockDto;
-import com.thirdeye3.stockmanager.entities.Stock;
 
 public interface StockService {
 
@@ -24,5 +25,7 @@ public interface StockService {
 	List<StockDto> getStocks(long page, long size);
 
 	Long getStockSize();
+	
+	void addStocksUsingCsv(MultipartFile file);
 
 }

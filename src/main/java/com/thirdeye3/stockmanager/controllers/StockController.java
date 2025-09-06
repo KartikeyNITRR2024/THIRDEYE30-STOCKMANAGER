@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.thirdeye3.stockmanager.dtos.Response;
 import com.thirdeye3.stockmanager.dtos.StockDto;
@@ -79,6 +80,12 @@ public class StockController {
     @GetMapping("/size")
     public Response<Long> getStockSize() {
         return new Response<>(true, 0, null,stockService.getStockSize());
+    }
+    
+    @PostMapping("/uploadCSV")
+    public Response<Boolean> addStocksUsingCsv(@RequestParam("file") MultipartFile file) {
+        stockService.addStocksUsingCsv(file);
+        return new Response<>(true, 0, null, true);
     }
 
 }
