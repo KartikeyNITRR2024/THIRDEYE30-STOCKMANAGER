@@ -195,42 +195,43 @@ public class StockServiceImpl implements StockService {
 
 	@Override
 	public void addStocksUsingCsv(MultipartFile file) {
-		List<StockDto> stockList = new ArrayList<>();
+	    List<StockDto> stockList = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+	    try (BufferedReader br = new BufferedReader(
+	            new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
 
-            String line;
-            boolean firstLine = true;
-            long idCounter = 1L;
+	        String line;
+	        boolean firstLine = true;
 
-            while ((line = br.readLine()) != null) {
-                if (firstLine) {
-                    firstLine = false;
-                    continue;
-                }
+	        while ((line = br.readLine()) != null) {
+	            if (firstLine) {
+	                firstLine = false;
+	                continue;
+	            }
 
-                String[] values = line.split(",");
-                if (values.length == 2) {
-                    String uniqueCode = values[1].trim();
-                    String marketCode = values[2].trim();
+	            String[] values = line.split(",");
+	            if (values.length >= 3) {
+	                String sno = values[0].trim();
+	                String uniqueCode = values[1].trim();
+	                String marketCode = values[2].trim();
 
-                    StockDto stock = new StockDto(
-                            null,
-                            uniqueCode,
-                            marketCode,
-                            null,                
-                            null,            
-                            null
-                    );
+	                StockDto stock = new StockDto(
+	                        null,
+	                        uniqueCode,
+	                        marketCode,
+	                        null,
+	                        null,
+	                        null
+	                );
 
-                    stockList.add(stock);
-                }
-            }
+	                stockList.add(stock);
+	            }
+	        }
 
-        } catch (Exception e) {
-            throw new CSVException("Failed to parse CSV file: " + e.getMessage());
-        }
-        addStocks(stockList);
+	    } catch (Exception e) {
+	        throw new CSVException("Failed to parse CSV file: " + e.getMessage());
+	    }
+
+	    addStocks(stockList);
 	}
 }
