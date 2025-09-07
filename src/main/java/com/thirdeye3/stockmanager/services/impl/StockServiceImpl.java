@@ -23,6 +23,7 @@ import com.thirdeye3.stockmanager.exceptions.CSVException;
 import com.thirdeye3.stockmanager.exceptions.ResourceNotFoundException;
 import com.thirdeye3.stockmanager.repositories.StockRepo;
 import com.thirdeye3.stockmanager.services.MachineService;
+import com.thirdeye3.stockmanager.services.PropertyService;
 import com.thirdeye3.stockmanager.services.StockService;
 import com.thirdeye3.stockmanager.utils.TimeManager;
 
@@ -37,6 +38,9 @@ public class StockServiceImpl implements StockService {
     
     @Autowired
     private TimeManager timeManager;
+    
+    @Autowired
+    private PropertyService propertyService;
 
     private static final Logger logger = LoggerFactory.getLogger(StockServiceImpl.class);
 
@@ -68,6 +72,7 @@ public class StockServiceImpl implements StockService {
             }
         }
         updateStocks();
+        propertyService.updateInitiatier();
         logger.info("{} new stocks added", addedCount);
     }
 

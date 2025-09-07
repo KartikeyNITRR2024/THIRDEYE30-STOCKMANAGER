@@ -33,9 +33,6 @@ public class Scheduler {
 
     @Value("${thirdeye.uniqueCode}")
     private String uniqueCode;
-    
-    @Value("${thirdeye.priority}")
-    private Integer priority;
 	
 	@Scheduled(fixedRate = 30000)
     public void checkStatusTask() {
@@ -46,8 +43,7 @@ public class Scheduler {
 	@Scheduled(cron = "${thirdeye.scheduler.cronToRefreshData}", zone = "${thirdeye.timezone}")
     public void runToRefreshdata() {
         try {
-        	TimeUnit.SECONDS.sleep(priority * 3); 
-            initiatier.init();
+            initiatier.refreshMemory();
             logger.info("🔄 Data refreshed at {}", timeManager.getCurrentTime());
         } catch (Exception e) {
             logger.error("❌ Failed to refresh data at {}: {}", timeManager.getCurrentTime(), e.getMessage());

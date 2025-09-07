@@ -6,6 +6,8 @@ import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import com.thirdeye3.stockmanager.dtos.Response;
 import com.thirdeye3.stockmanager.exceptions.PropertyFetchException;
@@ -27,6 +29,24 @@ public class PropertyServiceImpl implements PropertyService {
     private LocalTime morningPriceUpdaterEndTime = null;
     private LocalTime eveningPriceUpdaterStartTime = null;
     private LocalTime eveningPriceUpdaterEndTime = null;
+    
+    @Value("${thirdeye.priority}")
+    private Integer priority;
+    
+    @Async
+    @Override
+    public void updateInitiatier()
+    {
+    	Response<Object> response = propertyManager.updateInitiatier(priority);
+    	if(response.isSuccess())
+    	{
+    		logger.info("All services updated");
+    	}
+    	else
+    	{
+    		logger.info("Failed to update services");
+    	}
+    }
 
 
     @Override
