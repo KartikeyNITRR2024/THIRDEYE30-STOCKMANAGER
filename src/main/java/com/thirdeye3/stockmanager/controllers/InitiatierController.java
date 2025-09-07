@@ -27,7 +27,7 @@ public class InitiatierController {
     public Response<String> updateInitiatier(@PathVariable("priority") Integer requestPriority) {
         try {
             logger.info("Updating initiatier with priority: {}", requestPriority);
-            if(requestPriority>priority)
+            if(requestPriority<priority)
             {
             	initiatier.init();
                 return new Response<>(true, 0, null, "Initiatier updated with priority: " + requestPriority);
