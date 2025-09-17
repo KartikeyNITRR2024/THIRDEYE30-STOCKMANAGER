@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "THIRDEYE30-PROPERTYMANAGER")
 public interface PropertyManagerClient {
 
-    @GetMapping("/api/machines/webscrapper")
+    @GetMapping("/pm/machines/webscrapper")
     Response<MachineInfo> getMachines();
 
-    @GetMapping("/api/properties")
+    @GetMapping("/pm/properties")
     Response<Map<String, Object>> getProperties();
 
     @GetMapping("/api/updateinitiatier/{priority}")

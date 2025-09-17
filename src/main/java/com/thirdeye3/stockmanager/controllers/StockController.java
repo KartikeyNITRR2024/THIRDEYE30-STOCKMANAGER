@@ -14,7 +14,7 @@ import com.thirdeye3.stockmanager.dtos.StockDto;
 import com.thirdeye3.stockmanager.services.StockService;
 
 @RestController
-@RequestMapping("/api/stocks")
+@RequestMapping("/sm/stocks")
 public class StockController {
 
     private static final Logger logger = LoggerFactory.getLogger(StockController.class);
