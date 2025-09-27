@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.thirdeye3.stockmanager.dtos.StockDto;
 import com.thirdeye3.stockmanager.entities.Stock;
 import com.thirdeye3.stockmanager.exceptions.CSVException;
+import com.thirdeye3.stockmanager.exceptions.InvalidTimeException;
 import com.thirdeye3.stockmanager.exceptions.ResourceNotFoundException;
 import com.thirdeye3.stockmanager.repositories.StockRepo;
 import com.thirdeye3.stockmanager.services.MachineService;
@@ -126,11 +127,14 @@ public class StockServiceImpl implements StockService {
                         stockDto.getLastNightClosingPrice()
                 );
             }
+            else
+            {
+            	throw new InvalidTimeException("Invalid time to update stock price");
+            }
 
             updatedCount += count;
         }
 
-        // ✅ After processing all
         if (updatedCount < totalRequested) {
             throw new ResourceNotFoundException(
                 "Some stocks were not found. Requested: " + totalRequested + ", Updated: " + updatedCount

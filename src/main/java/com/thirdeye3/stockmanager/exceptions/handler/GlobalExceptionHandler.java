@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import com.thirdeye3.stockmanager.dtos.Response;
 import com.thirdeye3.stockmanager.exceptions.CSVException;
 import com.thirdeye3.stockmanager.exceptions.InvalidMachineException;
+import com.thirdeye3.stockmanager.exceptions.InvalidTimeException;
 import com.thirdeye3.stockmanager.exceptions.PropertyFetchException;
 import com.thirdeye3.stockmanager.exceptions.ResourceNotFoundException;
 
@@ -56,6 +57,21 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(response, HttpStatus.SERVICE_UNAVAILABLE);
     }
+    
+    
+    @ExceptionHandler(InvalidTimeException.class)
+    public ResponseEntity<Response<Void>> handleCSVException(InvalidTimeException ex) {
+        Response<Void> response = new Response<>(
+                false,
+                HttpStatus.BAD_REQUEST.value(),
+                ex.getMessage(),
+                null
+        );
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+    
+    
+    
     
     
 
