@@ -243,4 +243,11 @@ public class StockServiceImpl implements StockService {
 
 	    addStocks(stockList);
 	}
+	
+	@Override
+	public void resetAllOpeningPrice()
+	{
+		int count = stockRepo.resetAllOpeningPrices();
+		logger.info("Reset prices of "+count+" stocks to null");
+	}
 }

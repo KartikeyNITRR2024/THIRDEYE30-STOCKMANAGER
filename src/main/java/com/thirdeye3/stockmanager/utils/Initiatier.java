@@ -44,6 +44,7 @@ public class Initiatier {
 	public void refreshMemory()
 	{
 		logger.info("Going to refersh memory...");
+		stockService.resetAllOpeningPrice();
 		stockService.updateStocks();
 		logger.info("Memory refreshed.");
 	}

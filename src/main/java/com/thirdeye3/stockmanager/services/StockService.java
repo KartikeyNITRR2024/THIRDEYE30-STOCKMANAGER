@@ -28,4 +28,6 @@ public interface StockService {
 	
 	void addStocksUsingCsv(MultipartFile file);
 
+	void resetAllOpeningPrice();
+
 }

@@ -23,5 +23,10 @@ public interface StockRepo extends JpaRepository<Stock, Long> {
     @Query("UPDATE Stock s SET s.todaysOpeningPrice = :price WHERE s.uniqueId = :id")
     int updateTodaysOpeningPrice(Long id, Double price);
     
+    @Modifying
+    @Transactional
+    @Query("UPDATE Stock s SET s.todaysOpeningPrice = NULL")
+    int resetAllOpeningPrices();
+    
     Page<Stock> findAll(Pageable pageable);
 }
