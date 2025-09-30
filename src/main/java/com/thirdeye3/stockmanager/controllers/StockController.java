@@ -39,6 +39,14 @@ public class StockController {
         List<StockDto> stocks = stockService.getAllStock();
         return new Response<>(true, 0, null, stocks);
     }
+    
+    @DeleteMapping()
+    public Response<String> deleteAllStocks()
+    {
+    	logger.info("Deleteing all stocks");
+    	stockService.deleteAllStocks();
+    	return new Response<>(true, 0, null, "All stocks deleted successfully");
+    }
 
     
     @GetMapping("/webscrapper/{id}/{code}")

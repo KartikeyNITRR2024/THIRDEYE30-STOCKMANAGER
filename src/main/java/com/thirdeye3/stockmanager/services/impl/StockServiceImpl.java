@@ -141,6 +141,17 @@ public class StockServiceImpl implements StockService {
             );
         }
     }
+    
+    public void deleteAllStocks()
+    {
+        logger.info("Deleteing all stocks from DB...");
+    	stockRepo.deleteAll();
+    	stocks = null;
+    	stocks2 = null;
+        propertyService.updateInitiatier();
+        updateStocks();
+        logger.info("Removed all stocks");
+    }
 
 
     @Override
