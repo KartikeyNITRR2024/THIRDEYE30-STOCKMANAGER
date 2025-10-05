@@ -33,7 +33,7 @@ public class StockController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public Response<List<StockDto>> getAllStock() {
         logger.info("Request received: getAllStock");
         List<StockDto> stocks = stockService.getAllStock();
@@ -78,14 +78,14 @@ public class StockController {
                 "Stocks price updated successfully: " + stockList.size() + " updated.");
     }
     
-    @GetMapping("/{page}/{size}")
+    @GetMapping("/all/{page}/{size}")
     public Response<List<StockDto>> getStocks(
             @PathVariable long page,
             @PathVariable long size) {
         return new Response<>(true, 0, null,stockService.getStocks(page, size));
     }
     
-    @GetMapping("/size")
+    @GetMapping("/all/size")
     public Response<Long> getStockSize() {
         return new Response<>(true, 0, null,stockService.getStockSize());
     }
