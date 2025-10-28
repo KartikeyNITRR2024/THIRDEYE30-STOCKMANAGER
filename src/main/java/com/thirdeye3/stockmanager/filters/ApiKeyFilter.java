@@ -18,8 +18,8 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     @Value("${thirdeye.api.key}")
     private String apiKey;
 
-    @Value("${self.url}")
-    private String selfUrl;
+    @Value("${spring.profiles.active}")
+    private String profile;
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -31,11 +31,8 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         String requestUrl = request.getRequestURL().toString();
 
         String requestApiKey = request.getHeader("THIRDEYE-API-KEY");
-        if (requestApiKey == null) {
-            requestApiKey = request.getParameter("THIRDEYE-API-KEY");
-        }
 
-        if (apiKey != null && apiKey.equals(requestApiKey)) {
+        if (apiKey != null && apiKey.equals(requestApiKey) || profile.equalsIgnoreCase("LOCAL")) {
             filterChain.doFilter(request, response);
         } else {
             sendUnauthorizedResponse(response);

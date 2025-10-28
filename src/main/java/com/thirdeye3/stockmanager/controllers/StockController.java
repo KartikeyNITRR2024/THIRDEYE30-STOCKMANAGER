@@ -91,9 +91,9 @@ public class StockController {
     }
     
     @PostMapping("/uploadCSV")
-    public Response<Boolean> addStocksUsingCsv(@RequestParam("file") MultipartFile file) {
+    public Response<String> addStocksUsingCsv(@RequestParam("file") MultipartFile file) {
         stockService.addStocksUsingCsv(file);
-        return new Response<>(true, 0, null, true);
+        return new Response<>(true, 0, null, "Stocks uploaded successfully");
     }
 
 }
