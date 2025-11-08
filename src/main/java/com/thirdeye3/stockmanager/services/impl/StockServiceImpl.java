@@ -156,6 +156,9 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public List<StockDto> getByMachineNo(Integer machineId, String machineUniqueCode) {
+        if (stocks == null || stocks2 == null) {
+            updateStocks();
+        }
         Integer number = machineService.validateMachine(machineId, machineUniqueCode);
         Integer totalStocks = stocks.size();
         Integer totalMachine1 = machineService.getType1MachinesCount();
