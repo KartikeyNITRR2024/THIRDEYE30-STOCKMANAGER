@@ -29,4 +29,6 @@ public interface StockRepo extends JpaRepository<Stock, Long> {
     int resetAllOpeningPrices();
     
     Page<Stock> findAll(Pageable pageable);
+    
+    Page<Stock> findByUniqueCodeStartingWithIgnoreCase(String prefix, Pageable pageable);
 }

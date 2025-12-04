@@ -6,6 +6,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -88,6 +89,17 @@ public class StockController {
     @GetMapping("/all/size")
     public Response<Long> getStockSize() {
         return new Response<>(true, 0, null,stockService.getStockSize());
+    }
+    
+    @GetMapping("/stocks")
+    public Response<Page<StockDto>> getStocks(
+            @RequestParam(required = false) String start,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+        return new Response<>(true, 0, null,stockService.getStocks(start, page, size, sortBy, direction));
     }
     
     @PostMapping("/uploadCSV")

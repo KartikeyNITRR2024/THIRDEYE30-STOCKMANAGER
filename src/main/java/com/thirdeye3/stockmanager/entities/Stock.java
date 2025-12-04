@@ -8,6 +8,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Index;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -15,7 +17,12 @@ import lombok.AllArgsConstructor;
 import lombok.ToString;
 
 @Entity
-@Table(name = "STOCK")
+@Table(
+    name = "STOCK",
+    indexes = {
+        @Index(name = "idx_stock_unique_code", columnList = "STOCK_UNIQUE_CODE")
+    }
+)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -26,13 +33,13 @@ public class Stock {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "STOCK_ID")
-	private Long uniqueId;
-    
+    private Long uniqueId;
+
     @Column(name = "STOCK_UNIQUE_CODE")
-	private String uniqueCode;
-    
+    private String uniqueCode;
+
     @Column(name = "STOCK_MARKET_CODE")
-	private String marketCode;
+    private String marketCode;
 
     @Column(name = "LASTNIGHT_CLOSING_PRICE")
     private Double lastNightClosingPrice;
