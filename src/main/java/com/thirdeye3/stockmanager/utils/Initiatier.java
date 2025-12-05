@@ -38,6 +38,7 @@ public class Initiatier {
     	TimeUnit.SECONDS.sleep(priority * 3);
         machineService.fetchMachines();
         propertyService.fetchProperties();
+		stockService.updateStocks();
         logger.info("Initiatier initialized.");
     }
 	
