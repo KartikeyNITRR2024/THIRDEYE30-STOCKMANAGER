@@ -20,6 +20,9 @@ public class TimeManager {
     @Value("${thirdeye.timezone}")
     private String timeZone;
     
+    @Value("${thirdeye.istesting}")
+    private Integer isTesting;
+    
     @Autowired
     PropertyService propertyService;
 
@@ -36,6 +39,10 @@ public class TimeManager {
     }
     
     public boolean allowMorningPriceUpdate(Timestamp currentTime) {
+    	if(isTesting == 1)
+    	{
+    		return true;
+    	}
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timeZone));
         DayOfWeek day = now.getDayOfWeek();
 
@@ -51,6 +58,10 @@ public class TimeManager {
     }
 
     public boolean allowEveningPriceUpdate(Timestamp currentTime) {
+    	if(isTesting == 1)
+    	{
+    		return true;
+    	}
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timeZone));
         DayOfWeek day = now.getDayOfWeek();
 

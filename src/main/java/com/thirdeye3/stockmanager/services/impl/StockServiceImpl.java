@@ -118,19 +118,22 @@ public class StockServiceImpl implements StockService {
 
         for (StockDto stockDto : stockDtos) {
             int count = 0;
+            int check = 0;
             if (timeManager.allowMorningPriceUpdate(stockDto.getCurrentTime())) {
+            	check++;
                 count = stockRepo.updateTodaysOpeningPrice(
                         stockDto.getUniqueId(),
                         stockDto.getTodaysOpeningPrice()
                 );
             } 
-            else if (timeManager.allowEveningPriceUpdate(stockDto.getCurrentTime())) {
+            if (timeManager.allowEveningPriceUpdate(stockDto.getCurrentTime())) {
+            	check++;
                 count = stockRepo.updateLastNightClosingPrice(
                         stockDto.getUniqueId(),
                         stockDto.getLastNightClosingPrice()
                 );
             }
-            else
+            if(check == 0)
             {
             	throw new InvalidTimeException("Invalid time to update stock price");
             }
