@@ -3,6 +3,7 @@ package com.thirdeye3.stockmanager.services.impl;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Pageable;
 
@@ -112,41 +114,97 @@ public class StockServiceImpl implements StockService {
     }
     
     @Override
+    @Transactional
     public void updatePriceOfStock(List<StockDto> stockDtos) {
-        int totalRequested = stockDtos.size();
+
+        if (stockDtos == null || stockDtos.isEmpty()) {
+            return;
+        }
+        
+        Timestamp now = stockDtos.get(0).getCurrentTime();
+
+        boolean morningAllowed = timeManager.allowMorningPriceUpdate(now);
+        boolean eveningAllowed = timeManager.allowEveningPriceUpdate(now);
+
+        if (!morningAllowed && !eveningAllowed) {
+            throw new InvalidTimeException("Invalid time to update stock price");
+        }
+
+        List<Long> ids = stockDtos.stream()
+                .map(StockDto::getUniqueId)
+                .toList();
+
+        Map<Long, Stock> stockMap = stockRepo.findAllById(ids)
+                .stream()
+                .collect(Collectors.toMap(Stock::getUniqueId, s -> s));
+
         int updatedCount = 0;
 
-        for (StockDto stockDto : stockDtos) {
-            int count = 0;
-            int check = 0;
-            if (timeManager.allowMorningPriceUpdate(stockDto.getCurrentTime())) {
-            	check++;
-                count = stockRepo.updateTodaysOpeningPrice(
-                        stockDto.getUniqueId(),
-                        stockDto.getTodaysOpeningPrice()
-                );
-            } 
-            if (timeManager.allowEveningPriceUpdate(stockDto.getCurrentTime())) {
-            	check++;
-                count = stockRepo.updateLastNightClosingPrice(
-                        stockDto.getUniqueId(),
-                        stockDto.getLastNightClosingPrice()
-                );
-            }
-            if(check == 0)
-            {
-            	throw new InvalidTimeException("Invalid time to update stock price");
+        for (StockDto dto : stockDtos) {
+            Stock stock = stockMap.get(dto.getUniqueId());
+            if (stock == null) {
+                continue;
             }
 
-            updatedCount += count;
+            if (morningAllowed) {
+                stock.setTodaysOpeningPrice(dto.getTodaysOpeningPrice());
+            }
+
+            if (eveningAllowed) {
+                stock.setLastNightClosingPrice(dto.getLastNightClosingPrice());
+            }
+
+            updatedCount++;
         }
 
-        if (updatedCount < totalRequested) {
+        stockRepo.saveAll(stockMap.values());
+
+        if (updatedCount < stockDtos.size()) {
             throw new ResourceNotFoundException(
-                "Some stocks were not found. Requested: " + totalRequested + ", Updated: " + updatedCount
+                    "Some stocks not found. Requested: " +
+                            stockDtos.size() + ", Updated: " + updatedCount
             );
         }
+        
+        logger.info("Stockes price update succefully");
     }
+    
+//    @Override
+//    public void updatePriceOfStock(List<StockDto> stockDtos) {
+//        int totalRequested = stockDtos.size();
+//        int updatedCount = 0;
+//
+//        for (StockDto stockDto : stockDtos) {
+//            int count = 0;
+//            int check = 0;
+//            if (timeManager.allowMorningPriceUpdate(stockDto.getCurrentTime())) {
+//            	check++;
+//                count = stockRepo.updateTodaysOpeningPrice(
+//                        stockDto.getUniqueId(),
+//                        stockDto.getTodaysOpeningPrice()
+//                );
+//            } 
+//            if (timeManager.allowEveningPriceUpdate(stockDto.getCurrentTime())) {
+//            	check++;
+//                count = stockRepo.updateLastNightClosingPrice(
+//                        stockDto.getUniqueId(),
+//                        stockDto.getLastNightClosingPrice()
+//                );
+//            }
+//            if(check == 0)
+//            {
+//            	throw new InvalidTimeException("Invalid time to update stock price");
+//            }
+//
+//            updatedCount += count;
+//        }
+//
+//        if (updatedCount < totalRequested) {
+//            throw new ResourceNotFoundException(
+//                "Some stocks were not found. Requested: " + totalRequested + ", Updated: " + updatedCount
+//            );
+//        }
+//    }
     
     @Override
     public void deleteAllStocks()

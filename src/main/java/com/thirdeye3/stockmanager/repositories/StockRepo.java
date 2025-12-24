@@ -14,12 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface StockRepo extends JpaRepository<Stock, Long> {
 	@Modifying
-    @Transactional
     @Query("UPDATE Stock s SET s.lastNightClosingPrice = :price WHERE s.uniqueId = :id")
     int updateLastNightClosingPrice(Long id, Double price);
 
     @Modifying
-    @Transactional
     @Query("UPDATE Stock s SET s.todaysOpeningPrice = :price WHERE s.uniqueId = :id")
     int updateTodaysOpeningPrice(Long id, Double price);
     
