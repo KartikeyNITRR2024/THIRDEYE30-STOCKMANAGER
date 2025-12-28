@@ -1,4 +1,4 @@
-package com.thirdeye3.stockmanager.dtos;
+package com.thirdeye3.stockmanager;
 
 import java.sql.Timestamp;
 
@@ -13,12 +13,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class StockDto {
-    private Long uniqueId;
-    private String uniqueCode;
-    private String marketCode;
-    private Double lastNightClosingPrice;
-    private Double todaysOpeningPrice;
+public class LatestStockData {
 	private Timestamp currentTime;
 	private Double price;
 }

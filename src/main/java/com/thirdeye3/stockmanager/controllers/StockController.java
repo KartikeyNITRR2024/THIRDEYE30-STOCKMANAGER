@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.thirdeye3.stockmanager.LatestStockData;
 import com.thirdeye3.stockmanager.dtos.Response;
 import com.thirdeye3.stockmanager.dtos.StockDto;
 import com.thirdeye3.stockmanager.services.StockService;
@@ -100,6 +101,11 @@ public class StockController {
             @RequestParam(defaultValue = "asc") String direction
     ) {
         return new Response<>(true, 0, null,stockService.getStocks(start, page, size, sortBy, direction));
+    }
+    
+    @GetMapping("/history/{id}")
+    public Response<List<LatestStockData>> getHistory(@PathVariable long uniqueId) {
+        return new Response<>(true, 0, null,stockService.getHistoryData(uniqueId));
     }
     
     @PostMapping("/uploadCSV")

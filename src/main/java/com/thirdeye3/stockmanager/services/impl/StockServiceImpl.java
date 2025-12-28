@@ -22,11 +22,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Pageable;
 
+import com.thirdeye3.stockmanager.LatestStockData;
+import com.thirdeye3.stockmanager.dtos.Response;
 import com.thirdeye3.stockmanager.dtos.StockDto;
 import com.thirdeye3.stockmanager.entities.Stock;
 import com.thirdeye3.stockmanager.exceptions.CSVException;
 import com.thirdeye3.stockmanager.exceptions.InvalidTimeException;
 import com.thirdeye3.stockmanager.exceptions.ResourceNotFoundException;
+import com.thirdeye3.stockmanager.externalcontrollers.StockViewerClient;
 import com.thirdeye3.stockmanager.repositories.StockRepo;
 import com.thirdeye3.stockmanager.services.MachineService;
 import com.thirdeye3.stockmanager.services.PropertyService;
@@ -47,16 +50,24 @@ public class StockServiceImpl implements StockService {
     
     @Autowired
     private PropertyService propertyService;
+    
+    @Autowired
+    private StockViewerClient stockViewerClient;
 
     private static final Logger logger = LoggerFactory.getLogger(StockServiceImpl.class);
 
     private ConcurrentSkipListMap<Long, Stock> stocks = null;
     private Map<String, Stock> stocks2 = null;
+    private Map<Long, LatestStockData> lastStockData = null;
 
     public void updateStocks() {
         logger.info("Updating stock caches from DB...");
         stocks = new ConcurrentSkipListMap<>();
         stocks2 = new ConcurrentHashMap<>();
+        if(lastStockData == null)
+        {
+        	lastStockData = new ConcurrentHashMap<>();
+        }
         List<Stock> list = stockRepo.findAll();
         for (Stock stock : list) {
             stocks.put(stock.getUniqueId(), stock);
@@ -153,10 +164,13 @@ public class StockServiceImpl implements StockService {
             if (eveningAllowed) {
                 stock.setLastNightClosingPrice(dto.getLastNightClosingPrice());
             }
-
+            if(lastStockData == null)
+            {
+            	lastStockData = new ConcurrentHashMap<>();
+            }
+            lastStockData.put(dto.getUniqueId(), new LatestStockData(dto.getCurrentTime(), dto.getPrice()));
             updatedCount++;
         }
-
         stockRepo.saveAll(stockMap.values());
 
         if (updatedCount < stockDtos.size()) {
@@ -166,7 +180,7 @@ public class StockServiceImpl implements StockService {
             );
         }
         
-        logger.info("Stockes price update succefully");
+        logger.info("Stockes price update successfully");
     }
     
 //    @Override
@@ -247,14 +261,21 @@ public class StockServiceImpl implements StockService {
     }
 
     private StockDto toDto(Stock stock) {
-        return new StockDto(
+    	StockDto dto = new StockDto(
                 stock.getUniqueId(),
                 stock.getUniqueCode(),
                 stock.getMarketCode(),
                 stock.getLastNightClosingPrice(),
                 stock.getTodaysOpeningPrice(),
+                null,
                 null
         );
+        if(lastStockData.containsKey(dto.getUniqueId()) && lastStockData.get(dto.getUniqueId()) != null)
+        {
+        	dto.setCurrentTime(lastStockData.get(dto.getUniqueId()).getCurrentTime());
+        	dto.setPrice(lastStockData.get(dto.getUniqueId()).getPrice());
+        }
+        return dto;
     }
     
     private List<StockDto> toDtoList(List<Stock> stocks) {
@@ -309,6 +330,7 @@ public class StockServiceImpl implements StockService {
 	                        marketCode,
 	                        null,
 	                        null,
+	                        null,
 	                        null
 	                );
 
@@ -351,6 +373,21 @@ public class StockServiceImpl implements StockService {
 	public void resetAllOpeningPrice()
 	{
 		int count = stockRepo.resetAllOpeningPrices();
+		lastStockData = new ConcurrentHashMap<>();
 		logger.info("Reset prices of "+count+" stocks to null");
 	}
+	
+	@Override
+    public List<LatestStockData> getHistoryData(Long uniqueId)
+    {
+		Response<List<LatestStockData>> response = stockViewerClient.getStockHistory(uniqueId);
+		if(!response.isSuccess())
+		{
+			logger.error("History of stock {} not found", uniqueId);
+			throw new ResourceNotFoundException("Unable to find history of stock id "+uniqueId+" "+response.getErrorMessage());
+		}
+		logger.info("Returning history of stock {} "+uniqueId);
+		return response.getResponse();
+    	
+    }
 }
