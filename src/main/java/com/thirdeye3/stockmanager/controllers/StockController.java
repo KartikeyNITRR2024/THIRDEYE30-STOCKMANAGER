@@ -104,7 +104,7 @@ public class StockController {
     }
     
     @GetMapping("/history/{id}")
-    public Response<List<LatestStockData>> getHistory(@PathVariable long uniqueId) {
+    public Response<List<LatestStockData>> getHistory(@PathVariable("id") long uniqueId) {
         return new Response<>(true, 0, null,stockService.getHistoryData(uniqueId));
     }
     

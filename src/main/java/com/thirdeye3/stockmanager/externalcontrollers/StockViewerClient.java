@@ -30,7 +30,7 @@ public class StockViewerClient {
         return Flux.fromIterable(instances)
                 .flatMap(instance -> {
                     String url = instance.getUri().toString() + "/sv/processing/details/" + stockId;
-                    return webClient.post()
+                    return webClient.get()
                             .uri(url)
                             .retrieve()
                             .bodyToMono(typeRef)
